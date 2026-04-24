@@ -12,9 +12,9 @@ AI_backend/        ← AI phân tích (FastAPI + Ollama + Qwen3 + LangChain, por
 
 ## Yêu cầu
 
-- Python 3.10+
+- Python 3.12.11
 - [Ollama](https://ollama.com/download) đã cài đặt
-- Model Qwen3: `ollama pull qwen3`
+- Model qwen2.5:3b: `ollama pull qwen3`
 
 ## Khởi động nhanh
 
