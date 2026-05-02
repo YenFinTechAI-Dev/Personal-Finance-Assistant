@@ -2,9 +2,7 @@ const API_URL = "http://127.0.0.1:8000/api";
 const AI_URL  = "http://127.0.0.1:8001/api";
 let myChart;
 
-// ============================================================
-// 1. VẼ BIỂU ĐỒ
-// ============================================================
+
 function renderChart(labels, values) {
     const ctx = document.getElementById('expenseChart').getContext('2d');
     if (myChart) myChart.destroy();
@@ -30,9 +28,7 @@ function renderChart(labels, values) {
     });
 }
 
-// ============================================================
-// 2. CẬP NHẬT DASHBOARD
-// ============================================================
+
 async function loadDashboard() {
     try {
         const response = await fetch(`${API_URL}/dashboard`);
@@ -61,9 +57,7 @@ async function loadDashboard() {
     }
 }
 
-// ============================================================
-// 3. RENDER LỊCH SỬ GIAO DỊCH
-// ============================================================
+
 function renderHistory(history) {
     const container = document.getElementById('historyList');
     if (!container) return;
@@ -89,27 +83,23 @@ function renderHistory(history) {
     }).join('');
 }
 
-// ============================================================
-// 4. RENDER MARKDOWN ĐƠN GIẢN (cho phần phân tích AI)
-// ============================================================
+
 function renderMarkdown(text) {
     if (!text) return '';
     return text
-        // **text** → <strong>
+      
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        // Bullet points: • hoặc - ở đầu dòng
+    
         .replace(/^[•\-]\s+(.+)$/gm, '<li>$1</li>')
-        // Xuống dòng → <br>
+     
         .replace(/\n/g, '<br>')
-        // Bọc các <li> liên tiếp vào <ul>
+        
         .replace(/(<li>.*?<\/li>)(<br>(<li>.*?<\/li>))*/g, match =>
             '<ul style="margin:6px 0 6px 16px; padding:0; list-style:disc;">' + match.replace(/<br>/g, '') + '</ul>'
         );
 }
 
-// ============================================================
-// 5. XỬ LÝ AI
-// ============================================================
+
 async function processAI() {
     const textInput = document.getElementById('aiInput');
     const statusBox = document.getElementById('aiStatus');
@@ -127,7 +117,7 @@ async function processAI() {
         AI đang phân tích dữ liệu...
     </div>`;
 
-    // Lấy context đầy đủ từ dashboard
+  
     const dashboardData = await loadDashboard();
     let context = "Chưa có dữ liệu.";
     if (dashboardData) {
@@ -151,7 +141,7 @@ async function processAI() {
             const result = aiData.data;
 
             if (result.amount > 0) {
-                // --- Ghi giao dịch vào DB ---
+                
                 await fetch(`${API_URL}/transactions`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -160,7 +150,7 @@ async function processAI() {
                 await loadDashboard();
 
                 const typeColor = result.type === 'Chi' ? '#ef4444' : '#10b981';
-                const typeIcon  = result.type === 'Chi' ? '💸' : '💰';
+                const typeIcon  = result.type === 'Chi';
                 statusBox.className = "ai-status-box success";
                 statusBox.innerHTML = `
                     <div class="ai-result-row">
@@ -171,40 +161,38 @@ async function processAI() {
                         </div>
                     </div>`;
             } else {
-                // --- Phân tích / tư vấn – render markdown ---
+                
                 statusBox.className = "ai-status-box analysis";
                 statusBox.innerHTML = `
                     <div class="ai-analysis">
-                        <div class="ai-analysis-header">🧠 Phân tích AI – Tài chính của bạn</div>
+                        <div class="ai-analysis-header">Phân tích AI – Tài chính của bạn</div>
                         <div class="ai-analysis-body">${renderMarkdown(result.note)}</div>
                     </div>`;
             }
             textInput.value = "";
         } else {
             statusBox.className = "ai-status-box error";
-            statusBox.innerHTML = `❌ <strong>Lỗi AI:</strong> ${aiData.message}`;
+            statusBox.innerHTML = `<strong>Lỗi AI:</strong> ${aiData.message}`;
         }
     } catch (error) {
         statusBox.className = "ai-status-box error";
-        statusBox.innerHTML = `❌ <strong>Lỗi kết nối:</strong> Hãy kiểm tra AI server đang chạy tại port 8001.<br><small>${error.message}</small>`;
+        statusBox.innerHTML = `<strong>Lỗi kết nối:</strong> Hãy kiểm tra AI server đang chạy tại port 8001.<br><small>${error.message}</small>`;
     }
 
     btn.disabled = false;
     btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Gửi';
 }
 
-// ============================================================
-// 6. KHỞI TẠO
-// ============================================================
+
 document.addEventListener('DOMContentLoaded', () => {
     loadDashboard();
 
-    // Enter để gửi
+  
     document.getElementById('aiInput').addEventListener('keydown', (e) => {
         if (e.key === 'Enter') processAI();
     });
 
-    // Form nhập tay
+ 
     document.getElementById('transactionForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const payload = {
