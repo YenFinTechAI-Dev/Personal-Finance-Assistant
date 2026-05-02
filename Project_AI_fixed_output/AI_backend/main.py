@@ -7,10 +7,7 @@ import uvicorn
 from langchain_ollama import ChatOllama
 from langchain_core.messages import SystemMessage, HumanMessage
 
-# ============================================================
-# AI Backend – Qwen3 via Ollama + LangChain
-# Chạy: python main.py  (yêu cầu Ollama đang chạy ở port 11434)
-# ============================================================
+
 
 app = FastAPI(title="AI Backend – Qwen3 / Ollama")
 
@@ -21,7 +18,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- Khởi tạo model Qwen3 qua Ollama ---
+
 llm = ChatOllama(
     model="qwen3",
     base_url="http://localhost:11434",
@@ -40,17 +37,17 @@ Danh mục chuẩn: Ăn uống | Di chuyển | Mua sắm | Hóa đơn | Lương 
 Ví dụ: "phân tích chi tiêu", "tôi tiêu có nhiều không", "điểm mạnh yếu", "tư vấn tài chính"
 → Dựa vào context dashboard (số liệu thực) để phân tích THEO CẤU TRÚC sau trong trường "note":
 
-**📊 TỔNG QUAN:** [nhận xét nhanh về tình hình tài chính]
+**TỔNG QUAN:** [nhận xét nhanh về tình hình tài chính]
 
-**✅ ĐIỂM MẠNH:**
+**ĐIỂM MẠNH:**
 • [điểm mạnh 1 – có số liệu cụ thể]
 • [điểm mạnh 2]
 
-**⚠️ ĐIỂM YẾU:**
+**ĐIỂM YẾU:**
 • [điểm yếu 1 – có số liệu cụ thể]
 • [điểm yếu 2]
 
-**🎯 HƯỚNG ĐI & GIẢI PHÁP:**
+**HƯỚNG ĐI & GIẢI PHÁP:**
 • [giải pháp cụ thể, khả thi 1]
 • [giải pháp cụ thể, khả thi 2]
 • [giải pháp 3 nếu cần]
@@ -113,14 +110,14 @@ async def analyze_text(request: AIRequest):
         response = await llm.ainvoke(messages)
         raw_text = response.content.strip()
 
-        # Xóa thẻ <think>...</think> nếu Qwen3 bật chế độ thinking
+       
         raw_text = re.sub(r'<think>.*?</think>', '', raw_text, flags=re.DOTALL).strip()
 
-        # Xóa markdown code fence nếu có
+     
         raw_text = re.sub(r'^```(?:json)?\s*', '', raw_text).strip()
         raw_text = re.sub(r'\s*```$', '', raw_text).strip()
 
-        # Parse JSON
+       
         try:
             data = json.loads(raw_text)
         except json.JSONDecodeError:
@@ -133,7 +130,7 @@ async def analyze_text(request: AIRequest):
                     "message": "AI trả về định dạng không hợp lệ. Vui lòng thử lại."
                 }
 
-        # Đảm bảo amount luôn là số nguyên không âm
+     
         data["amount"] = max(0, int(data.get("amount", 0)))
 
         return {"status": "success", "data": data}
