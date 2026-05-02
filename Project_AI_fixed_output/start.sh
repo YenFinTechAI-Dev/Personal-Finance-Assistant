@@ -1,7 +1,5 @@
 #!/bin/bash
-# =====================================================
-# KHỞI ĐỘNG TOÀN BỘ HỆ THỐNG
-# =====================================================
+
 
 echo ""
 echo "╔══════════════════════════════════════════════╗"
@@ -9,48 +7,48 @@ echo "║   Quản Lý Chi Tiêu AI – Khởi động hệ thống  ║"
 echo "╚══════════════════════════════════════════════╝"
 echo ""
 
-# --- Bước 1: Kiểm tra Ollama ---
-echo "🔍 Kiểm tra Ollama..."
+
+echo "Kiểm tra Ollama..."
 if ! command -v ollama &> /dev/null; then
-    echo "❌ Ollama chưa được cài. Tải tại: https://ollama.com/download"
+    echo " Ollama chưa được cài. Tải tại: https://ollama.com/download"
     exit 1
 fi
 
 # Kéo model Qwen3 nếu chưa có
-echo "📦 Đảm bảo model qwen3 đã được tải..."
+echo "Đảm bảo model qwen3 đã được tải..."
 ollama pull qwen3
 
 # Chạy Ollama server nền
-echo "🚀 Khởi động Ollama server..."
+echo "Khởi động Ollama server..."
 ollama serve &> /tmp/ollama.log &
 sleep 2
-echo "   ✅ Ollama đang chạy (port 11434)"
+echo "   Ollama đang chạy (port 11434)"
 
-# --- Bước 2: Backend (port 8000) ---
+
 echo ""
-echo "🗄️  Khởi động Backend API (port 8000)..."
+echo "Khởi động Backend API (port 8000)..."
 cd Backend
 pip install -r requirements.txt -q
 python main.py &
 BACKEND_PID=$!
 cd ..
 sleep 1
-echo "   ✅ Backend đang chạy (PID $BACKEND_PID)"
+echo "   Backend đang chạy (PID $BACKEND_PID)"
 
-# --- Bước 3: AI Backend (port 8001) ---
+
 echo ""
-echo "🤖 Khởi động AI Backend – Qwen3 (port 8001)..."
+echo "Khởi động AI Backend – Qwen3 (port 8001)..."
 cd AI_backend
 pip install -r requirements.txt -q
 python main.py &
 AI_PID=$!
 cd ..
 sleep 1
-echo "   ✅ AI Backend đang chạy (PID $AI_PID)"
+echo "   AI Backend đang chạy (PID $AI_PID)"
 
-# --- Bước 4: Mở Frontend ---
+
 echo ""
-echo "🌐 Mở giao diện web..."
+echo "Mở giao diện web..."
 if command -v xdg-open &> /dev/null; then
     xdg-open "Front-end/index.html"
 elif command -v open &> /dev/null; then
@@ -68,5 +66,5 @@ echo "  Nhấn Ctrl+C để dừng tất cả"
 echo "════════════════════════════════════════════"
 echo ""
 
-# Giữ script chạy
+
 wait
